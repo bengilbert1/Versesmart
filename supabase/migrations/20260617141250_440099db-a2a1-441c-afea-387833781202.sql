@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS commentator_portraits_authenticated_read ON storage.objects;

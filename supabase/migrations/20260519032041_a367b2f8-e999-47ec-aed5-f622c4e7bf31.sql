@@ -1,0 +1,1 @@
+revoke execute on function public.trim_search_history() from public, anon, authenticated;

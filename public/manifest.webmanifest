@@ -1,0 +1,19 @@
+{
+  "name": "VerseSmart — Any Bible verse, Global perspectives, What's yours?",
+  "short_name": "VerseSmart",
+  "description": "Any Bible verse, Global perspectives, What's yours? VerseSmart lets you compare how theologians from different cultures, traditions, and worldviews interpret any Bible verse — all in one place.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#1e2a4a",
+  "theme_color": "#1e2a4a",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/favicon-16x16.png", "sizes": "16x16", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon-32x32.png", "sizes": "32x32", "type": "image/png", "purpose": "any" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

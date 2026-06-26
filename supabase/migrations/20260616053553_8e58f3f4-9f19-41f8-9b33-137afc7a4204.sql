@@ -1,0 +1,1 @@
+ALTER TABLE public.commentator_overrides ADD COLUMN IF NOT EXISTS portrait_url text;

@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.admin_commentator_audit(text) FROM PUBLIC;

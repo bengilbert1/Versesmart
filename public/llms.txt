@@ -1,0 +1,12 @@
+# VerseSmart
+
+> Any Bible verse, Global perspectives, What's yours? VerseSmart lets you compare how theologians from different cultures, traditions, and worldviews interpret any Bible verse — all in one place.
+
+## Pages
+
+- [/](/): Home — pick any Bible verse and compare five classic commentaries.
+- [/verse/{slug}](/verse/john-3-16): Static commentary pages for popular verses (e.g. /verse/john-3-16, /verse/psalms-23-1, /verse/romans-8-28).
+- [/pricing](/pricing): Pricing — unlimited access plans.
+- [/privacy](/privacy): Privacy policy.
+- [/terms](/terms): Terms of service.
+- [/refund](/refund): Refund policy.
