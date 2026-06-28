@@ -1,11 +1,5 @@
 {
-    "version": 2,
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "dist/server/server.js"
-      }
-    ],
-    "outputDirectory": "dist"
-  }
-  
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
+}
