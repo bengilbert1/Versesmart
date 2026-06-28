@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+
 import { Sparkles, GitCompare, BookOpen, ArrowRight } from "lucide-react";
 import { getPublicCommentary } from "@/lib/verse-page.functions";
 import { referenceToSlug, slugToReference } from "@/lib/verse-slug";

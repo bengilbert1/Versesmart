@@ -20,7 +20,7 @@
 //   ?offset=M      — start index into POPULAR_VERSES (default 0)
 //   ?force=1       — re-warm even if a fresh cache entry exists
 //   ?maxAgeDays=N  — treat entries older than N days as stale (default 7)
-import { createFileRoute } from "@tanstack/react-router";
+
 import { POPULAR_VERSES } from "@/lib/popular-verses";
 import { referenceToSlug } from "@/lib/verse-slug";
 import { getPublicCommentary } from "@/lib/verse-page.functions";

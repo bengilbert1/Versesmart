@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { render } from '@react-email/components'
-import { createFileRoute } from '@tanstack/react-router'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { InviteEmail } from '@/lib/email-templates/invite'
 import { OneTimeCodeEmail } from '@/lib/email-templates/one-time-code'

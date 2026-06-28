@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+
 import type {} from "@tanstack/react-start";
 import { POPULAR_VERSES } from "@/lib/popular-verses";
 import { referenceToSlug } from "@/lib/verse-slug";

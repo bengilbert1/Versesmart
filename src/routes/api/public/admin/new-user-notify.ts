@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { render } from '@react-email/components'
 import { createClient } from '@supabase/supabase-js'
-import { createFileRoute } from '@tanstack/react-router'
+
 import { z } from 'zod'
 import { NewUserSignupEmail } from '@/lib/email-templates/new-user-signup'
 

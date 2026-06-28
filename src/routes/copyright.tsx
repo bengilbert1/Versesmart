@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+
 import { BookOpen, Scale, Languages, Users, Sparkles, Target } from "lucide-react";
 
 export const Route = createFileRoute("/copyright")({

@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+
 import { useServerFn } from "@tanstack/react-start";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { BookOpen, GitCompare, Sparkles, Loader2, Lock } from "lucide-react";

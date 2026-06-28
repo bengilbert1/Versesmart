@@ -1,8 +1,7 @@
 import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import { Check } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useLanguage } from "@/lib/language-context";
+
 import { LANGUAGES, type LanguageCode } from "@/lib/languages";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 

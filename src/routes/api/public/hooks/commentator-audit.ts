@@ -4,7 +4,7 @@
 // header. /api/public/* bypasses auth on published sites, so we still verify
 // the apikey header here as a basic shared-secret check before running the
 // privileged SQL audit function.
-import { createFileRoute } from "@tanstack/react-router";
+
 
 export const Route = createFileRoute("/api/public/hooks/commentator-audit")({
   server: {

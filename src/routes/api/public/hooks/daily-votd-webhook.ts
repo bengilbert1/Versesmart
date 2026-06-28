@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+
 import { DEFAULT_VOTD, DEFAULT_SUMMARIES, getDayOfYearForDate } from "@/lib/votd-defaults";
 import votdEn from "@/locales/votd/en.json";
 

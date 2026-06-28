@@ -3,7 +3,7 @@ import { render } from '@react-email/components'
 import { parseEmailWebhookPayload } from '@lovable.dev/email-js'
 import { WebhookError, verifyWebhookRequest } from '@lovable.dev/webhooks-js'
 import { createClient } from '@supabase/supabase-js'
-import { createFileRoute } from '@tanstack/react-router'
+
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { InviteEmail } from '@/lib/email-templates/invite'
 import { OneTimeCodeEmail } from '@/lib/email-templates/one-time-code'
