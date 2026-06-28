@@ -3237,3 +3237,4 @@ function RecoveryModal({
     </div>
   );
 }
+export default Index
