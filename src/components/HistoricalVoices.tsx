@@ -1,14 +1,10 @@
-
-import { useServerFn } from "@tanstack/react-start";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { BookOpen, GitCompare, Sparkles, Loader2, Lock } from "lucide-react";
 import {
-  compareHistoricalCommentaries,
   HISTORICAL_GROUPS,
   type HistoricalCommentaryResult,
   type HistoricalGroupKey,
 } from "@/lib/historical-commentary.functions";
-import { listDeletedCommentators } from "@/lib/commentator-overrides.functions";
 import { normalizeName } from "@/lib/commentator-metadata";
 import { getPaddleEnvironment } from "@/lib/paddle";
 import { AuthorThumbnail } from "@/components/AuthorThumbnail";
@@ -16,6 +12,9 @@ import { CopyCardButton } from "@/components/CopyCardButton";
 
 const GROUP_KEYS: HistoricalGroupKey[] = ["foundational", "fathers", "reformation"];
 
+// -----------------------------
+// 1. REPLACES useServerFn + useQueries
+// -----------------------------
 export function useHistoricalGroups({
   reference,
   translation,
@@ -27,26 +26,49 @@ export function useHistoricalGroups({
   enabled: boolean;
   language?: "en" | "es" | "fr" | "de" | "zh-Hans" | "zh-Hant" | "hi" | "ar";
 }) {
-  const fetchFn = useServerFn(compareHistoricalCommentaries);
-  return useQueries({
-    queries: GROUP_KEYS.map((group) => ({
-      queryKey: ["historical-commentary", group, reference, translation, language],
-      queryFn: () =>
-        fetchFn({
-          data: {
-            reference,
-            group,
-            translation: translation as any,
-            environment: getPaddleEnvironment(),
-            language,
-          },
-        }),
-      enabled: enabled && !!reference,
-      staleTime: 1000 * 60 * 30,
-    })),
-  });
+  const [results, setResults] = useState<(HistoricalCommentaryResult | null)[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!enabled || !reference) return;
+
+    async function load() {
+      setLoading(true);
+      try {
+        const env = getPaddleEnvironment();
+
+        const promises = GROUP_KEYS.map((group) =>
+          fetch("/api/historical-commentary", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              reference,
+              group,
+              translation,
+              environment: env,
+              language,
+            }),
+          }).then((r) => r.json())
+        );
+
+        const data = await Promise.all(promises);
+        setResults(data);
+      } catch (err) {
+        console.error("Historical commentary fetch failed", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
+  }, [reference, translation, enabled, language]);
+
+  return { results, loading };
 }
 
+// -----------------------------
+// 2. UI COMPONENTS (unchanged)
+// -----------------------------
 export function HistoricalGroupSection({ data }: { data: HistoricalCommentaryResult }) {
   const meta = HISTORICAL_GROUPS[data.group];
   const slight = data.contrasts.filter((c) => c.severity === "slight");
@@ -105,9 +127,7 @@ export function HistoricalGroupSection({ data }: { data: HistoricalCommentaryRes
                 <AuthorThumbnail name={c.author} size={40} />
                 <div className="min-w-0 flex-1">
                   <h3 className="font-display truncate text-base font-semibold">{c.author}</h3>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {c.era}
-                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{c.era}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <CopyCardButton
@@ -154,12 +174,10 @@ function ContrastBlock({
   const bg = tone === "slight" ? "bg-slight-diff/5" : "bg-strong-diff/5";
   const text = tone === "slight" ? "text-slight-diff" : "text-strong-diff";
   const cleanEra = (era?: string) => era?.replace(/^c\.\s*/i, "") ?? "";
+
   return (
     <div>
-      <Pill
-        icon={<GitCompare className={`h-3.5 w-3.5 ${text}`} />}
-        tone={tone}
-      >
+      <Pill icon={<GitCompare className={`h-3.5 w-3.5 ${text}`} />} tone={tone}>
         {title}
       </Pill>
       <div className="mt-3 space-y-3">
@@ -201,6 +219,7 @@ function Pill({
         : tone === "strong"
           ? "border-strong-diff text-strong-diff"
           : "border-border text-foreground";
+
   return (
     <h3 className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${toneClass}`}>
       {icon}
@@ -209,14 +228,23 @@ function Pill({
   );
 }
 
+// -----------------------------
+// 3. HistoricalAnonymousTeaser (no TanStack)
+// -----------------------------
 export function HistoricalAnonymousTeaser() {
-  const fetchDeleted = useServerFn(listDeletedCommentators);
-  const { data: deleted } = useQuery({
-    queryKey: ["commentator-deleted"],
-    queryFn: () => fetchDeleted(),
-    staleTime: 60_000,
-  });
-  const deletedSet = new Set(deleted ?? []);
+  const [deleted, setDeleted] = useState<string[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      const res = await fetch("/api/commentator-deleted");
+      const json = await res.json();
+      setDeleted(json ?? []);
+    }
+    load();
+  }, []);
+
+  const deletedSet = new Set(deleted);
+
   return (
     <section className="rounded-3xl border border-border bg-card p-6 sm:p-8">
       <div className="flex flex-col items-center text-center">
@@ -260,12 +288,12 @@ export function HistoricalAnonymousTeaser() {
       </div>
 
       <div className="mt-6 flex flex-col items-center gap-2">
-        <Link
-          to="/signup"
+        <a
+          href="/signup"
           className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
         >
           Sign up free — unlock all 4 groups
-        </Link>
+        </a>
         <p className="text-xs text-muted-foreground">
           Paid plans add contemporary theologians (N. T. Wright, Keller, Piper, Moltmann…) — from $9.99/mo.
         </p>
@@ -274,6 +302,9 @@ export function HistoricalAnonymousTeaser() {
   );
 }
 
+// -----------------------------
+// 4. HistoricalVoices (main component)
+// -----------------------------
 export function HistoricalVoices({
   reference,
   translation,
@@ -285,15 +316,15 @@ export function HistoricalVoices({
   enabled: boolean;
   bonusHistorical?: HistoricalCommentaryResult[] | null;
 }) {
-  const queries = useHistoricalGroups({ reference, translation, enabled: enabled && !bonusHistorical });
+  const { results, loading } = useHistoricalGroups({
+    reference,
+    translation,
+    enabled: enabled && !bonusHistorical,
+  });
 
-  const results: HistoricalCommentaryResult[] = bonusHistorical
+  const finalResults: HistoricalCommentaryResult[] = bonusHistorical
     ? bonusHistorical
-    : queries
-        .map((q) => q.data)
-        .filter((d): d is HistoricalCommentaryResult => !!d && !d.locked);
-
-  const anyLoading = !bonusHistorical && queries.some((q) => q.isLoading);
+    : results.filter((d): d is HistoricalCommentaryResult => !!d && !d.locked);
 
   return (
     <div className="space-y-6">
@@ -305,7 +336,7 @@ export function HistoricalVoices({
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      {anyLoading && (
+      {loading && (
         <div className="rounded-2xl border border-dashed border-border bg-card/40 p-4 text-center text-sm text-muted-foreground">
           <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
           Bringing in Foundational, Patristic, and Reformation voices…
@@ -313,7 +344,7 @@ export function HistoricalVoices({
       )}
 
       <div className="grid gap-6">
-        {results.map((g) => (
+        {finalResults.map((g) => (
           <HistoricalGroupSection key={g.group} data={g} />
         ))}
       </div>

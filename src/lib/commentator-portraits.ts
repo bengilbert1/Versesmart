@@ -1,7 +1,7 @@
 // Shared client-side lookup for admin-uploaded commentator portraits.
 // Pulls from the same query key the admin panel uses so updates are
 // instantly reflected everywhere AuthorThumbnail renders.
-import { useQuery } from "@tanstack/react-query";
+
 import { useMemo } from "react";
 import {
   listCommentatorOverrides,

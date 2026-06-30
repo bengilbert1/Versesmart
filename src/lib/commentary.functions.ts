@@ -1,5 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
+
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import { getUserTier, getMonthlySearchCount, logSearchUsage, isActiveTester } from "./tier-server";

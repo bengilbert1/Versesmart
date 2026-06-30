@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { DEFAULT_VOTD, DEFAULT_SUMMARIES, getDayOfYearForDate, type VotdEntry, type VotdSummaries } from "./votd-defaults";
 

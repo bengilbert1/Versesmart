@@ -1,5 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
+
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import { getUserTier } from "./tier-server";
@@ -276,4 +275,3 @@ export const getBonusStatus = createServerFn({ method: "GET" })
     const eligible = Date.now() >= nextMs;
     return { eligible, useCount, nextAvailableAt: eligible ? null : new Date(nextMs).toISOString() };
   });
-

@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Loader2, ChevronDown, ArrowRight, X } from "lucide-react";
-import { searchByTheme, type ThemeSearchResult } from "@/lib/theme-search.functions";
 import { useT } from "@/lib/language-context";
 import { trackThemeSearch } from "@/lib/track-analytics";
 
@@ -13,21 +10,47 @@ type Props = {
 
 export function ThemeSearch({ onPick, disabled }: Props) {
   const t = useT();
-  const fetchFn = useServerFn(searchByTheme);
+
   const [query, setQuery] = useState("");
   const [openTheme, setOpenTheme] = useState<string | null>(null);
 
-  const mutation = useMutation({
-    mutationFn: async (q: string): Promise<ThemeSearchResult> => fetchFn({ data: { query: q } }),
-  });
+  // Replacing TanStack mutation
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<null | { themes: any[] }>(null);
+
+  async function runSearch(q: string) {
+    try {
+      setLoading(true);
+      setError(null);
+      setData(null);
+
+      // Replace this with your actual API route
+      const res = await fetch("/api/theme-search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q }),
+      });
+
+      if (!res.ok) throw new Error("Search failed");
+
+      const json = await res.json();
+      setData(json);
+    } catch (err) {
+      setError(t("theme.error"));
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = query.trim();
-    if (!trimmed || mutation.isPending) return;
+    if (!trimmed || loading) return;
+
     setOpenTheme(null);
     trackThemeSearch(trimmed);
-    mutation.mutate(trimmed);
+    runSearch(trimmed);
   };
 
   return (
@@ -38,15 +61,15 @@ export function ThemeSearch({ onPick, disabled }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("theme.placeholder")}
-          disabled={disabled || mutation.isPending}
+          disabled={disabled || loading}
           className="flex-1 rounded-xl border border-white/70 bg-white/70 px-4 py-3 text-base outline-none transition shadow-[0_4px_16px_-8px_rgba(47,72,88,0.18)] backdrop-blur focus:ring-2 focus:ring-ring disabled:opacity-50 placeholder:text-muted-foreground"
         />
         <button
           type="submit"
-          disabled={disabled || mutation.isPending || !query.trim()}
+          disabled={disabled || loading || !query.trim()}
           className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
         >
-          {mutation.isPending ? (
+          {loading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <>
@@ -56,30 +79,30 @@ export function ThemeSearch({ onPick, disabled }: Props) {
         </button>
       </form>
 
-      {mutation.isError && (
-        <p className="mt-2 text-center text-xs text-destructive">{t("theme.error")}</p>
+      {error && (
+        <p className="mt-2 text-center text-xs text-destructive">{error}</p>
       )}
 
-
-      {mutation.data && (
+      {data && (
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">
-              {mutation.data.themes.length}{" "}
-              {mutation.data.themes.length === 1 ? t("theme.theme") : t("theme.themes")}
+              {data.themes.length}{" "}
+              {data.themes.length === 1 ? t("theme.theme") : t("theme.themes")}
             </p>
             <button
               type="button"
               onClick={() => {
                 setOpenTheme(null);
-                mutation.reset();
+                setData(null);
               }}
               className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
             >
               <X className="h-3.5 w-3.5" /> {t("theme.hideSuggestions")}
             </button>
           </div>
-          {mutation.data.themes.map((t) => {
+
+          {data.themes.map((t) => {
             const active = openTheme === t.theme;
             return (
               <div key={t.theme} className="rounded-2xl border border-border bg-card overflow-hidden">
@@ -93,9 +116,12 @@ export function ThemeSearch({ onPick, disabled }: Props) {
                     <p className="mt-0.5 text-xs leading-snug text-muted-foreground">{t.blurb}</p>
                   </div>
                   <ChevronDown
-                    className={`mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${active ? "rotate-180" : ""}`}
+                    className={`mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
+                      active ? "rotate-180" : ""
+                    }`}
                   />
                 </button>
+
                 {active && (
                   <div className="grid gap-1.5 border-t border-border bg-background/40 p-2 sm:grid-cols-2">
                     {t.verses.map((v) => (
@@ -105,7 +131,9 @@ export function ThemeSearch({ onPick, disabled }: Props) {
                         onClick={() => onPick(v.reference)}
                         className="group rounded-xl border border-border bg-card p-3 text-left transition hover:border-foreground/30 hover:bg-accent/40"
                       >
-                        <span className="font-display text-sm font-semibold group-hover:underline">{v.reference}</span>
+                        <span className="font-display text-sm font-semibold group-hover:underline">
+                          {v.reference}
+                        </span>
                         <p className="mt-0.5 text-xs leading-snug text-muted-foreground">{v.blurb}</p>
                       </button>
                     ))}

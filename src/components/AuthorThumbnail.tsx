@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+
 import { authorThumbQueryOptions } from "@/lib/author-wiki";
 import { usePortraitForName } from "@/lib/commentator-portraits";
 import { cn } from "@/lib/utils";

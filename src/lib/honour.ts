@@ -1,22 +1,49 @@
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { getVisitorCountry } from "@/lib/geo.functions";
+
+type VisitorCountryResponse = {
+  country?: string;
+};
+
+/**
+ * Client-safe version (no TanStack Start)
+ * Assumes you have an API route or external endpoint for geo lookup.
+ * Replace URL below with your real endpoint if needed.
+ */
+async function fetchVisitorCountry(): Promise<VisitorCountryResponse> {
+  try {
+    const res = await fetch("/api/geo");
+
+    if (!res.ok) return {};
+
+    return await res.json();
+  } catch {
+    return {};
+  }
+}
 
 /**
  * Returns "Honor" for US visitors, "Honour" otherwise.
- * Replaces any occurrence of the British spelling in `text`.
  */
 export function useHonourSpelling(): "Honour" | "Honor" {
-  const fetchCountry = useServerFn(getVisitorCountry);
   const { data } = useQuery({
     queryKey: ["visitor-country"],
-    queryFn: () => fetchCountry(),
+    queryFn: fetchVisitorCountry,
     staleTime: 1000 * 60 * 60 * 24,
   });
+
   return data?.country === "US" ? "Honor" : "Honour";
 }
 
-export function localizeHonour(text: string, spelling: "Honour" | "Honor"): string {
+/**
+ * Localizes spelling in text
+ */
+export function localizeHonour(
+  text: string,
+  spelling: "Honour" | "Honor"
+): string {
   if (spelling === "Honour") return text;
-  return text.replace(/Honour/g, "Honor").replace(/honour/g, "honor");
+
+  return text
+    .replace(/Honour/g, "Honor")
+    .replace(/honour/g, "honor");
 }

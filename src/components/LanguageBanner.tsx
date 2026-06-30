@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+
+
 import { X } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 import { getLanguage, suggestedLanguageFromCountry, UI_STRINGS } from "@/lib/languages";
